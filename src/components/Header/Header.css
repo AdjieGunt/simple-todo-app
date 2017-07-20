@@ -1,0 +1,22 @@
+#header {
+    background: #F9FAFB;
+    color: #fff;
+}
+
+#header h2 {
+    color: #000;
+}
+
+#top-nav {
+    padding-top:10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e1e2;
+}
+
+#top-nav a{
+    color: #000;
+}
+
+#top-nav a:hover {
+    text-decoration: none;
+}
