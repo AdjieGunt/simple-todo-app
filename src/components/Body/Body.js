@@ -15,7 +15,8 @@ class Body extends Component {
                     text:"Example Task",
                     completed:true
                 }
-            ]
+            ],
+            filter : 'all'
         };
         // console.log(this.state);        
 
@@ -52,6 +53,31 @@ class Body extends Component {
         return;
     }
 
+     onDelete(i){
+        var editTodo = this.state.todos;
+        editTodo.splice(i, 1);
+        this.setState({
+            todos:editTodo
+        });
+        // console.log(this.props.todos.length);
+    }
+
+     onCheck(i){
+        var editTodo = this.state.todos;
+        editTodo[i].completed = !editTodo[i].completed;
+        this.setState({
+            todos:editTodo
+        });
+
+        
+    }
+
+    onFilterHandler(filter) {
+        this.setState({
+            filter:filter
+        })
+    }
+
     nextId() {
         var todos = this.state.todos;
         // console.log(todos); 
@@ -70,8 +96,20 @@ class Body extends Component {
                     onchange={this.onChange.bind(this)}
                     onsubmit={this.onSubmitHandle.bind(this)} />
                 </div>
-                <div className="col-xs-8 col-xs-offset-1">
-                    <TodoList  todos={this.state.todos} onclick={this.onClick.bind(this)}/>
+                <div className="col-xs-9 col-xs-offset-1 text-center">
+                    <TodoFilter todos={this.state.todos} 
+                    onfilter={this.onFilterHandler.bind(this)}
+                    />
+                </div>
+                <div className="col-xs-9 col-xs-offset-1">
+                    <TodoList  
+                        todos={this.state.todos}
+                        onclick={this.onClick.bind(this)}
+                        ondelete={this.onDelete.bind(this)}
+                        oncheck={this.onCheck.bind(this)}
+                        filter={this.state.filter}
+                        
+                        />
                 </div>
             </div>
         );
@@ -107,13 +145,18 @@ class TodoForm extends Component {
 class TodoList extends Component {
     removeHandler(){
         this.props.onRemove(this.todo.id);
-        console.log(this.props.onRemove(this.todo.id));
+  
     }
     render(){
         return(
             <div className="row">    
                 <ol className="todos">
-                    <TodoListItem todos={this.props.todos}/>
+                    <TodoListItem 
+                        todos={this.props.todos}
+                        ondelete={this.props.ondelete}
+                        oncheck={this.props.oncheck}
+                        filter={this.props.filter}
+                        onfilter={this.props.filter}/>
                 </ol>  
             </div>
         );
@@ -121,37 +164,38 @@ class TodoList extends Component {
 }
 
 class TodoListItem extends Component {
-    onCheck(i){
-
-        var editTodo = this.props.todos[i];
-        editTodo.completed = !editTodo.completed;
-        this.setState({
-            todos:editTodo
-        });
-        // console.log(this.state);
-    }
-
-    onDelete(i){
-        var editTodo = this.props.todos;
-        delete editTodo[i];
-        this.setState({
-            todos:editTodo
-        });
-    }
-
     render(){
         var todos = this.props.todos;
+        // console.log(todos);
+        var filter = this.props.filter;
+        var completedTodos = [];
+        var IncompletedTodos = [];
+        
+        for (var i=0;i<todos.length;i++) {
+            if (todos[i].completed) {
+                completedTodos[i] = todos[i];
+            } else {
+                IncompletedTodos[i] = todos[i];
+            }
+        }
+
+        if (filter===true) {
+            todos = completedTodos;            
+        } else if (filter===false) {
+            todos = IncompletedTodos;            
+        } 
+
         return(
             <div>{todos.map((todo, i)=>  
                  <li key={todo.id} >
                      <span
                         style={ !todo.completed ? {textDecoration:'none'} : {textDecoration:'line-through',color:'grey'} }
-                        onClick={() => this.onCheck(i)} >
+                        onClick={() => this.props.oncheck(i)} >
                             {todo.text}
                              
                      </span>
                      
-                     <span onClick={() => this.onDelete(i)} className="delete pull-right">
+                     <span onClick={() => this.props.ondelete(i)} className="delete pull-right">
                          <i className="glyphicon glyphicon-remove"></i>
                      </span>
                  </li>
@@ -161,8 +205,34 @@ class TodoListItem extends Component {
     }
 }
 
+class TodoFilter extends Component {
+    render(){
+        var allTodo = this.props.todos.length;
+        var Incompleted = 0;
+        var Completed = 0;
+
+        for (var i=0;i<allTodo;i++) {
+            if(this.props.todos[i].completed) {
+                Completed += 1;
+            } else {
+                Incompleted += 1;
+            }
+        }
+
+
+        return(
+            <div className="todo-filter">
+                <span className="btn btn-info" onClick={() => this.props.onfilter('all')}>All Tasks<span className="badge">{allTodo}</span></span>
+                <span className="btn btn-primary" onClick={() => this.props.onfilter(false)}>Incompleted <span className="badge">{Incompleted}</span></span>
+                <span className="btn btn-success" onClick={() => this.props.onfilter(true)}>Completed <span className="badge">{Completed}</span></span>
+            </div>
+        );
+    }
+}
+
 Body.propTypes = {
     todo: PropTypes.string,
+    todos: PropTypes.object,    
 }
 
 export default Body;

@@ -19,11 +19,15 @@ ol.todos {
 
 ol.todos li {
     background:#fff;
-    margin-top:10px; 
-    padding:10px;
+    margin-top:5px; 
+    padding:5px;
     cursor: pointer;
-    border: 1px solid #FF5722;
+    /* border: 1px solid #FF5722; */
     font-weight: bold;
+}
+
+.todo-filter {
+    margin-bottom: 15px;
 }
 
 .btn {
